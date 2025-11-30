@@ -70,6 +70,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LICENSE file
 - CHANGELOG.md
 
+## [1.1.0] - 2025-01-30
+
+### Added
+
+#### Analytics Module
+- Advanced prescription analytics service with volume, accuracy, and performance metrics
+- ML-powered analytics engine for adverse event pattern detection
+- Safety signal identification and risk prediction
+- Anomaly detection using Isolation Forest
+- Comprehensive reporting service for regulatory oversight
+- Support for multiple report types (volume, activity, performance, compliance)
+- Data visualization capabilities with matplotlib, seaborn, and plotly
+- Export functionality for JSON, CSV, and PDF formats
+
+#### Dependencies
+- Added numpy>=1.24.0 for numerical computing
+- Added pandas>=2.0.0 for data analysis
+- Added scikit-learn>=1.3.0 for machine learning
+- Added joblib>=1.3.0 for model persistence
+- Added matplotlib, seaborn, plotly for visualization (optional)
+
+### Updated
+- README.md with analytics module documentation
+- requirements.txt with analytics dependencies
+- Repository structure to include analytics directory
+
 ## [Unreleased]
 
 ### Planned Features

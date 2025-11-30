@@ -39,3 +39,14 @@ pytest-mock>=3.10.0
 black>=22.0.0
 flake8>=5.0.0
 mypy>=0.990
+
+# Analytics and ML dependencies
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+joblib>=1.3.0
+
+# Data visualization (optional)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0

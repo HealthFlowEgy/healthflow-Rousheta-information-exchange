@@ -9,6 +9,7 @@ The HealthFlow Information Exchange library provides standardized interfaces and
 - **Prescribing Functions**: Electronic prescription creation, modification, and transmission
 - **Dispensing Functions**: Pharmacy routing, prescription tracking, and fulfillment
 - **Regulator Functions**: Read-only access to prescription and dispensation data for regulatory oversight
+- **Analytics Functions**: Advanced analytics, reporting, and ML-powered insights
 - **Integration Standards**: FHIR R4, HL7 v2.x, NCPDP SCRIPT, and EHR integrations
 
 ## Architecture
@@ -23,6 +24,10 @@ healthflow-information-exchange/
 │   │   └── prescription_tracking_service.py
 │   ├── regulator/            # Regulatory oversight APIs
 │   │   └── regulator_api.py
+│   ├── analytics/            # Analytics and reporting services
+│   │   ├── analytics_service.py
+│   │   ├── analytics_engine.py
+│   │   └── reporting_service.py
 │   ├── integrations/         # Healthcare standards integrations
 │   │   ├── fhir_integration.py
 │   │   ├── hl7_integration.py
@@ -82,6 +87,27 @@ healthflow-information-exchange/
   - Dispensation records with pharmacist information
   - Doctor and pharmacy activity tracking
   - Compliance monitoring
+
+### Analytics Module
+
+- **Prescription Analytics**:
+  - Volume metrics and trends
+  - Accuracy and quality metrics
+  - Performance analysis
+  - Error pattern detection
+
+- **ML-Powered Analytics**:
+  - Adverse event pattern detection
+  - Safety signal identification
+  - Anomaly detection
+  - Risk prediction and scoring
+
+- **Comprehensive Reporting**:
+  - Prescription volume reports
+  - Dispensation activity reports
+  - Provider and pharmacy performance
+  - Compliance and quality metrics
+  - Regulatory overview reports
 
 ### Integration Module
 
