@@ -5,70 +5,84 @@ All notable changes to the HealthFlow Information Exchange library will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-01-30
+---
+
+## [2.0.0] - 2025-01-30
+
+### 🇪🇬 Egyptian EPX Edition
+
+Complete restructuring to support Egyptian national digital prescription infrastructure.
 
 ### Added
 
-#### Prescribing Module
-- Complete NCPDP SCRIPT 2017071 implementation
-- Support for NewRx (New Prescription) messages
-- Support for RxChange (Prescription Change) messages
-- Support for RxFill (Fill Notification) messages
-- Support for Status messages
-- Support for Error messages
-- Support for Refill Request/Response messages
-- Support for Cancellation messages
-- Prescription validation and error handling
+#### Egyptian Healthcare Models
+- **EgyptianDoctor**: Egyptian Medical Syndicate (EMS) numbers, EDA licenses, National ID
+- **EgyptianPatient**: 14-digit National ID, Egyptian health insurance
+- **EgyptianMedicine**: EDA registration, Arabic names, Egyptian pricing (EGP)
+- **EgyptianPrescription**: RX-YYYY-XXXXXX format, QR codes, digital signatures
+- **EgyptianPharmacy**: Pharmacy syndicate numbers, governorate-based addressing
+- **EgyptianPharmacist**: Pharmacists syndicate registration
+- **EgyptianDispensation**: Egyptian dispensation records with insurance coverage
+- **EgyptianRegulator**: EDA and Ministry of Health regulatory users
 
-#### Dispensing Module
-- Pharmacy directory and lookup functionality
-- Geographic-based pharmacy search using geopy
-- Pharmacy network routing (Surescripts, Direct, Retail Chain, Mail Order, Specialty)
-- Pharmacy availability and status tracking
-- Prescription tracking service
-- Fill notification handling
-- Patient notification system
+#### Egyptian Identifiers
+- National ID validation (14-digit format with governorate codes)
+- Prescription number format: `RX-YYYY-XXXXXX`
+- Egyptian Medical Syndicate (EMS) numbers
+- Egyptian Drug Authority (EDA) licenses
+- Egyptian Pharmacists Syndicate numbers
 
-#### Regulator Module
-- Read-only API for regulatory oversight
-- Prescription query with multiple filters
-- Dispensation record access
-- Doctor activity tracking
-- Pharmacy activity tracking
-- Statistical reporting
-- Comprehensive audit logging
+#### Governorate Support
+- All 27 Egyptian governorates enum
+- Governorate-based filtering and analytics
+- Regional regulator support
 
-#### Integration Module
-- FHIR R4 support with fhir.resources library
-- MedicationRequest resource builder
-- Patient resource builder
-- Practitioner resource builder
-- Organization resource builder
-- Bundle creation and parsing
-- HL7 v2.x message support with hl7apy
-- RDE^O11 (Pharmacy/Treatment Encoded Order) message builder
-- ACK (General Acknowledgment) message builder
-- HL7 message parsing and validation
-- EHR integration framework
+#### Controlled Substances
+- Egyptian controlled substance schedules (Schedule 1-5)
+- EDA compliance requirements
+- Special approval workflows
 
-#### Documentation
-- Comprehensive README with usage examples
-- API documentation structure
-- Module-specific documentation placeholders
-- Example scripts for common workflows
-- Installation and configuration guides
+#### Arabic Language Support
+- Arabic names for doctors, patients, pharmacies
+- Arabic medicine names (trade and generic)
+- Arabic instructions and notes
+- Bilingual data models throughout
 
-#### Testing
-- Test directory structure
-- pytest configuration
-- Coverage reporting setup
+#### API Services
+- **Prescription Submission Gateway**: Submit e-prescriptions in Egyptian format
+- **Pharmacy Retrieval API**: Retrieve prescriptions by patient ID or QR code
+- **Dispensing API**: Record dispensations with Egyptian pharmacy details
+- **Regulator Central API**: EDA oversight with dashboard and analytics
 
-### Infrastructure
-- Python package structure with proper __init__.py files
-- requirements.txt with all dependencies
-- .gitignore for Python projects
-- LICENSE file
-- CHANGELOG.md
+#### Central Database
+- National prescription registry models
+- Egyptian-specific data structures
+- Audit logging for EDA compliance
+- Prescription and dispensation statistics
+
+#### Analytics and Reporting
+- Prescription volume analytics
+- Dispensation activity tracking
+- Provider and pharmacy performance metrics
+- Compliance and quality reports
+- Regulatory overview dashboards
+
+### Changed
+
+- **Repository Structure**: Reorganized to focus on API gateways and central database
+- **Data Models**: Replaced US-centric models with Egyptian healthcare standards
+- **Identifiers**: Removed NPI, DEA, Surescripts - added Egyptian equivalents
+- **Pricing**: Changed from USD to EGP (Egyptian Pounds)
+- **Pharmacy Network**: Removed US pharmacy networks, added Egyptian syndicate integration
+
+### Removed
+
+- US healthcare identifiers (NPI, DEA, state licenses)
+- Surescripts network integration
+- US pharmacy routing logic
+- US-specific validation rules
+
+---
 
 ## [1.1.0] - 2025-01-30
 
@@ -96,32 +110,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - requirements.txt with analytics dependencies
 - Repository structure to include analytics directory
 
+---
+
+## [1.0.0] - 2025-01-30
+
+### Added
+
+#### Initial Release
+
+**Prescribing Module**:
+- NCPDP SCRIPT 2017071 implementation
+- NewRx, RxChange, RxFill, Status, Error, Refill, Cancel messages
+- Prescription validation and formatting
+- Surescripts network protocol support
+
+**Dispensing Module**:
+- Pharmacy routing and network management
+- Prescription tracking and status updates
+- Fill notifications and pickup tracking
+
+**Regulator Module**:
+- Read-only access APIs for regulatory oversight
+- Prescription and dispensation data queries
+- Statistics and reporting
+- Audit trail logging
+
+**Integration Module**:
+- FHIR R4 resource builders (MedicationRequest, Patient, Practitioner, Organization)
+- HL7 v2.x message handling (RDE^O11, ACK)
+- EHR connectivity framework
+
+**Documentation**:
+- Comprehensive README with usage examples
+- API documentation
+- Example scripts
+- CHANGELOG tracking
+
+**Infrastructure**:
+- Python package structure with proper `__init__.py` files
+- Requirements.txt with all dependencies
+- LICENSE file (proprietary)
+- .gitignore for Python projects
+
+---
+
 ## [Unreleased]
 
 ### Planned Features
-- REST API endpoints for all modules
+
+- REST API endpoints for all modules (Flask/FastAPI wrapper)
 - GraphQL API support
 - WebSocket support for real-time updates
-- Enhanced error handling and retry logic
-- Rate limiting and throttling
-- Caching layer with Redis
-- Database models with SQLAlchemy
 - Message queue integration (RabbitMQ/Kafka)
-- Monitoring and metrics collection
-- Performance optimization
-- Additional integration standards (X12, CDA)
-- Multi-language support
 - Docker containerization
-- Kubernetes deployment configurations
-- CI/CD pipeline setup
-
-### Future Enhancements
-- Machine learning-based pharmacy recommendations
-- Predictive analytics for prescription patterns
-- Advanced fraud detection
-- Patient adherence tracking
-- Drug interaction checking
-- Formulary management
-- Prior authorization automation
-- Electronic signature support
-- Mobile SDK for iOS and Android
+- Kubernetes deployment manifests
+- CI/CD pipeline (GitHub Actions)
+- Unit and integration tests
+- Performance benchmarks
+- API rate limiting
+- Caching layer (Redis)
+- Database migrations (Alembic)
+- OpenAPI/Swagger documentation
+- Postman collection
+- SDK for TypeScript/Node.js integration

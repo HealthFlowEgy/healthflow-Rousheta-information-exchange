@@ -1,414 +1,375 @@
-# HealthFlow Information Exchange
+# HealthFlow Information Exchange Library
 
-A dedicated library for healthcare information exchange functions supporting prescribing, dispensing, and regulatory oversight operations. This repository contains only the core information exchange logic without any portal or UI components.
+**Egyptian E-Prescription Information Exchange - Python Library**
+
+A comprehensive Python library for electronic prescription information exchange in Egypt's national digital prescription infrastructure. This library provides the core APIs and data models for prescription submission, pharmacy retrieval, dispensing, and regulatory oversight.
+
+---
 
 ## Overview
 
-The HealthFlow Information Exchange library provides standardized interfaces and implementations for:
+The HealthFlow Information Exchange library provides standardized interfaces for:
 
-- **Prescribing Functions**: Electronic prescription creation, modification, and transmission
-- **Dispensing Functions**: Pharmacy routing, prescription tracking, and fulfillment
-- **Regulator Functions**: Read-only access to prescription and dispensation data for regulatory oversight
-- **Analytics Functions**: Advanced analytics, reporting, and ML-powered insights
-- **Integration Standards**: FHIR R4, HL7 v2.x, NCPDP SCRIPT, and EHR integrations
+- **Prescription Submission Gateway**: APIs for doctors to submit e-prescriptions in Egyptian format
+- **Pharmacy Retrieval APIs**: APIs for pharmacies to retrieve prescriptions from central database
+- **Dispensing APIs**: APIs to record prescription dispensation
+- **Regulator Central Database**: National prescription registry with analytics for EDA oversight
+- **Egyptian Healthcare Standards**: Full support for Egyptian identifiers, governorates, and regulations
+
+---
 
 ## Architecture
 
 ```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                  INFORMATION EXCHANGE ARCHITECTURE                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │                      DOCTOR EMR / PORTAL                              │  │
+│  └──────────────────────────┬───────────────────────────────────────────┘  │
+│                             │                                               │
+│                             ▼                                               │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │             PRESCRIPTION SUBMISSION GATEWAY                           │  │
+│  │  • Validate Egyptian format (RX-2025-XXXXXX)                          │  │
+│  │  • Verify doctor credentials (EMS, EDA)                               │  │
+│  │  • Store in central database                                          │  │
+│  │  • Generate QR code                                                   │  │
+│  └──────────────────────────┬───────────────────────────────────────────┘  │
+│                             │                                               │
+│                             ▼                                               │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │                  CENTRAL PRESCRIPTION DATABASE                        │  │
+│  │              (National Registry - Single Source of Truth)             │  │
+│  │  • All prescriptions nationally                                       │  │
+│  │  • Egyptian identifiers (National ID, EMS, EDA)                       │  │
+│  │  • Complete audit trail                                               │  │
+│  └──────────────────────────┬───────────────────────────────────────────┘  │
+│                             │                                               │
+│       ┌─────────────────────┼─────────────────────┐                        │
+│       ▼                     ▼                     ▼                        │
+│  ┌──────────────┐  ┌──────────────────┐  ┌──────────────────┐             │
+│  │  PHARMACY    │  │   DISPENSING     │  │    REGULATOR     │             │
+│  │  RETRIEVAL   │  │      API         │  │   CENTRAL API    │             │
+│  │     API      │  │                  │  │                  │             │
+│  │──────────────│  │──────────────────│  │──────────────────│             │
+│  │ • Search by  │  │ • Record         │  │ • Dashboard      │             │
+│  │   patient ID │  │   dispensation   │  │   statistics     │             │
+│  │ • Scan QR    │  │ • Update         │  │ • Analytics      │             │
+│  │ • Verify Rx  │  │   inventory      │  │   reports        │             │
+│  │              │  │ • Audit log      │  │ • Compliance     │             │
+│  └──────────────┘  └──────────────────┘  └──────────────────┘             │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Repository Structure
+
+```
 healthflow-information-exchange/
 ├── src/
-│   ├── prescribing/          # E-prescribing services
-│   │   └── eprescribing_service.py
-│   ├── dispensing/           # Pharmacy and dispensing services
-│   │   ├── pharmacy_routing_service.py
+│   ├── gateway/                      # Prescription submission gateway
+│   │   ├── prescription_submission_api.py
 │   │   └── prescription_tracking_service.py
-│   ├── regulator/            # Regulatory oversight APIs
-│   │   └── regulator_api.py
-│   ├── analytics/            # Analytics and reporting services
+│   │
+│   ├── apis/                         # Pharmacy and dispensing APIs
+│   │   ├── pharmacy_retrieval_api.py
+│   │   └── dispensing_api.py
+│   │
+│   ├── regulator/                    # Regulatory oversight APIs
+│   │   ├── regulator_api.py
+│   │   └── regulator_central_api.py
+│   │
+│   ├── database/                     # Central database models
+│   │   └── models.py
+│   │
+│   ├── models/                       # Egyptian-specific models
+│   │   └── egyptian_models.py
+│   │
+│   ├── analytics/                    # Analytics and reporting
 │   │   ├── analytics_service.py
 │   │   ├── analytics_engine.py
 │   │   └── reporting_service.py
-│   ├── integrations/         # Healthcare standards integrations
+│   │
+│   ├── integrations/                 # Healthcare standards
 │   │   ├── fhir_integration.py
 │   │   ├── hl7_integration.py
 │   │   └── ehr_integration.py
-│   ├── models/               # Data models and schemas
-│   ├── utils/                # Utility functions
-│   └── __init__.py
-├── docs/                     # Documentation
-├── tests/                    # Unit and integration tests
-├── examples/                 # Usage examples
+│   │
+│   └── prescribing/                  # E-prescribing services
+│       └── eprescribing_service.py
+│
+├── docs/                             # Documentation
+├── examples/                         # Usage examples
+├── tests/                            # Unit and integration tests
+├── requirements.txt                  # Python dependencies
 └── README.md
 ```
 
-## Features
+---
 
-### Prescribing Module
+## Egyptian Healthcare Standards
 
-- **NCPDP SCRIPT Support**: Full implementation of NCPDP SCRIPT 2017071 standard
-  - NewRx (New Prescription)
-  - RxChange (Prescription Change)
-  - RxFill (Fill Notification)
-  - Status Messages
-  - Error Messages
-  - Refill Requests/Responses
-  - Cancellation
+### National Identifiers
 
-- **Prescription Management**:
-  - Create and validate prescriptions
-  - Modify existing prescriptions
-  - Track prescription status
-  - Handle controlled substances
+- **National ID**: 14-digit Egyptian National ID (validated format)
+- **Doctor Syndicate Number**: Egyptian Medical Syndicate (EMS) registration
+- **EDA License**: Egyptian Drug Authority prescriber license
+- **Pharmacy License**: Egyptian Pharmacists Syndicate number
+- **Prescription Number**: `RX-YYYY-XXXXXX` format
 
-### Dispensing Module
+### Governorates
 
-- **Pharmacy Network Management**:
-  - Pharmacy directory and lookup
-  - Network routing (Surescripts, Direct, Retail Chain, Mail Order, Specialty)
-  - Geographic-based pharmacy search
-  - Pharmacy availability and status tracking
+Supports all 27 Egyptian governorates:
+- Cairo, Giza, Alexandria
+- Dakahlia, Red Sea, Beheira
+- And 21 more...
 
-- **Prescription Tracking**:
-  - Real-time prescription status updates
-  - Fill notifications
-  - Pickup tracking
-  - Patient notifications
+### Controlled Substances
 
-### Regulator Module
+Egyptian controlled substance schedules (Schedule 1-5) per EDA regulations.
 
-- **Read-Only Access APIs**:
-  - Query prescriptions by various filters
-  - Access dispensation records
-  - Generate statistics and reports
-  - Audit trail logging
+---
 
-- **Data Access**:
-  - Prescription records with full metadata
-  - Dispensation records with pharmacist information
-  - Doctor and pharmacy activity tracking
-  - Compliance monitoring
+## Key Features
 
-### Analytics Module
+### 1. Prescription Submission Gateway
 
-- **Prescription Analytics**:
-  - Volume metrics and trends
-  - Accuracy and quality metrics
-  - Performance analysis
-  - Error pattern detection
+```python
+from src.gateway.prescription_submission_api import PrescriptionSubmissionGateway, PrescriptionFormat
 
-- **ML-Powered Analytics**:
-  - Adverse event pattern detection
-  - Safety signal identification
-  - Anomaly detection
-  - Risk prediction and scoring
+gateway = PrescriptionSubmissionGateway(database_connection)
 
-- **Comprehensive Reporting**:
-  - Prescription volume reports
-  - Dispensation activity reports
-  - Provider and pharmacy performance
-  - Compliance and quality metrics
-  - Regulatory overview reports
+response = gateway.submit_prescription(
+    prescription_data={
+        "prescription_number": "RX-2025-ABC123",
+        "doctor_id": "28501011234567",  # Egyptian National ID
+        "doctor_syndicate_number": "EMS-12345",
+        "patient_id": "29012011234567",
+        "medications": [...]
+    },
+    format=PrescriptionFormat.JSON,
+    submitter_id="28501011234567",
+    submitter_type="doctor"
+)
+```
 
-### Integration Module
+### 2. Pharmacy Retrieval API
 
-- **FHIR R4 Integration**:
-  - MedicationRequest resources
-  - Patient resources
-  - Practitioner resources
-  - Organization resources
-  - Bundle creation and parsing
+```python
+from src.apis.pharmacy_retrieval_api import PharmacyRetrievalAPI
 
-- **HL7 v2.x Integration**:
-  - RDE^O11 (Pharmacy/Treatment Encoded Order)
-  - ACK (General Acknowledgment)
-  - Message parsing and validation
+retrieval_api = PharmacyRetrievalAPI(database_connection)
 
-- **EHR Integration**:
-  - Standardized EHR connectivity
-  - Patient data synchronization
-  - Clinical data exchange
+# Retrieve prescription by transaction ID
+result = retrieval_api.get_prescription_by_tx_id(
+    prescription_tx_id="RX-2025-ABC123",
+    pharmacy_id="PHARM-001"
+)
 
-## Standards Compliance
+# Search by patient
+prescriptions = retrieval_api.search_prescriptions_by_patient(
+    patient_id="29012011234567",
+    pharmacy_id="PHARM-001"
+)
+```
 
-This library implements the following healthcare interoperability standards:
+### 3. Dispensing API
 
-- **NCPDP SCRIPT 2017071**: Electronic prescribing standard
-- **HL7 FHIR R4**: Fast Healthcare Interoperability Resources
-- **HL7 v2.5+**: Health Level Seven messaging protocol
-- **Surescripts**: E-prescribing network protocol
-- **HIPAA**: Health Insurance Portability and Accountability Act compliance
+```python
+from src.apis.dispensing_api import DispensingAPI
+
+dispensing_api = DispensingAPI(database_connection)
+
+response = dispensing_api.record_dispensation(
+    prescription_tx_id="RX-2025-ABC123",
+    pharmacy_id="PHARM-001",
+    pharmacy_name="Cairo Pharmacy",
+    pharmacy_license="EPL-12345",
+    pharmacist_id="28701011234567",
+    pharmacist_name="Ahmed Mohamed",
+    pharmacist_license="EPS-67890",
+    medications_dispensed=[...]
+)
+```
+
+### 4. Regulator Central API
+
+```python
+from src.regulator.regulator_central_api import RegulatorCentralAPI
+
+regulator_api = RegulatorCentralAPI(
+    central_database=db,
+    analytics_service=analytics,
+    reporting_service=reporting
+)
+
+# Get dashboard statistics
+stats = regulator_api.get_dashboard_statistics(
+    regulator_id="REG-001",
+    period="30d"
+)
+
+# Generate compliance report
+report = regulator_api.get_analytics_report(
+    regulator_id="REG-001",
+    report_type="compliance",
+    start_date=datetime(2025, 1, 1),
+    end_date=datetime(2025, 1, 31)
+)
+
+# Monitor doctor activity
+activity = regulator_api.get_doctor_activity(
+    regulator_id="REG-001",
+    doctor_id="28501011234567"
+)
+```
+
+### 5. Egyptian Models
+
+```python
+from src.models.egyptian_models import (
+    EgyptianDoctor,
+    EgyptianPatient,
+    EgyptianPrescription,
+    EgyptianMedicine,
+    EgyptianDispensation,
+    validate_egyptian_national_id,
+    validate_prescription_number
+)
+
+# Validate Egyptian National ID
+is_valid = validate_egyptian_national_id("28501011234567")
+
+# Validate prescription number format
+is_valid = validate_prescription_number("RX-2025-ABC123")
+```
+
+---
+
+## Analytics and Reporting
+
+### Prescription Analytics
+
+- Volume metrics and trends
+- Accuracy and quality metrics
+- Performance analysis
+- Error pattern detection
+
+### ML-Powered Analytics
+
+- Adverse event pattern detection
+- Safety signal identification
+- Anomaly detection
+- Risk prediction and scoring
+
+### Comprehensive Reporting
+
+- Prescription volume reports
+- Dispensation activity reports
+- Provider and pharmacy performance
+- Compliance and quality metrics
+- Regulatory overview reports
+
+---
 
 ## Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/HealthFlowEgy/healthflow-information-exchange.git
-
-# Install dependencies
-cd healthflow-information-exchange
 pip install -r requirements.txt
 ```
 
-## Usage Examples
+### Requirements
 
-### Creating a New Prescription (NCPDP SCRIPT)
+- Python 3.11+
+- PostgreSQL (for central database)
+- Redis (optional, for caching)
 
-```python
-from src.prescribing.eprescribing_service import (
-    NCPDPScriptBuilder,
-    Prescriber,
-    Patient,
-    Medication,
-    Pharmacy
-)
-
-# Initialize builder
-builder = NCPDPScriptBuilder()
-
-# Create prescription entities
-prescriber = Prescriber(
-    npi="1234567890",
-    dea="AB1234563",
-    state_license="MD12345",
-    first_name="John",
-    last_name="Smith",
-    phone="5551234567",
-    fax="5551234568",
-    address_line1="123 Medical Plaza",
-    city="Boston",
-    state="MA",
-    zip_code="02101",
-    email="dr.smith@example.com"
-)
-
-patient = Patient(
-    first_name="Jane",
-    last_name="Doe",
-    dob="19800115",
-    gender="F",
-    address_line1="456 Main St",
-    city="Boston",
-    state="MA",
-    zip_code="02101",
-    phone="5559876543",
-    email="jane.doe@example.com"
-)
-
-medication = Medication(
-    drug_description="Lisinopril 10mg Tablet",
-    drug_coded="00093314501",
-    quantity=30.0,
-    quantity_qualifier="C38288",
-    days_supply=30,
-    refills=3,
-    substitutions="1",
-    sig="Take 1 tablet by mouth once daily",
-    note="For blood pressure control",
-    diagnosis="I10"
-)
-
-pharmacy = Pharmacy(
-    ncpdp_id="1234567",
-    npi="9876543210",
-    name="CVS Pharmacy",
-    address_line1="789 Pharmacy Ave",
-    city="Boston",
-    state="MA",
-    zip_code="02101",
-    phone="5551112222",
-    fax="5551112223"
-)
-
-# Build NewRx message
-newrx_xml = builder.build_newrx(
-    prescriber=prescriber,
-    patient=patient,
-    medication=medication,
-    pharmacy=pharmacy,
-    written_date="20250130"
-)
-
-print(newrx_xml)
-```
-
-### Creating FHIR MedicationRequest
-
-```python
-from src.integrations.fhir_integration import FHIRResourceBuilder
-
-# Initialize builder
-fhir_builder = FHIRResourceBuilder(organization_id="healthflow-org")
-
-# Build Patient resource
-patient = fhir_builder.build_patient_resource(
-    patient_id="patient-123",
-    first_name="Jane",
-    last_name="Doe",
-    dob="1980-01-15",
-    gender="female",
-    phone="555-987-6543",
-    email="jane.doe@example.com"
-)
-
-# Build Practitioner resource
-practitioner = fhir_builder.build_practitioner_resource(
-    practitioner_id="practitioner-456",
-    first_name="John",
-    last_name="Smith",
-    npi="1234567890",
-    specialty="Cardiology"
-)
-
-# Build MedicationRequest
-med_request = fhir_builder.build_medication_request(
-    request_id="prescription-789",
-    patient_reference="Patient/patient-123",
-    practitioner_reference="Practitioner/practitioner-456",
-    medication_name="Lisinopril 10mg Tablet",
-    medication_code="314076",
-    dosage_instruction="Take 1 tablet by mouth once daily",
-    quantity=30,
-    refills=3
-)
-
-# Export to JSON
-print(med_request.json(indent=2))
-```
-
-### Pharmacy Routing
-
-```python
-from src.dispensing.pharmacy_routing_service import (
-    PharmacyRoutingService,
-    RoutingPreferences,
-    PharmacyNetwork
-)
-
-# Initialize routing service
-routing_service = PharmacyRoutingService()
-
-# Define patient preferences
-preferences = RoutingPreferences(
-    preferred_pharmacy_id=None,
-    max_distance_miles=5.0,
-    preferred_networks=[PharmacyNetwork.RETAIL_CHAIN],
-    require_24_hour=False,
-    require_drive_through=True,
-    insurance_plan_id="plan-123"
-)
-
-# Find suitable pharmacies
-pharmacies = routing_service.find_pharmacies(
-    patient_latitude=42.3601,
-    patient_longitude=-71.0589,
-    preferences=preferences
-)
-
-for pharmacy in pharmacies:
-    print(f"{pharmacy.name} - {pharmacy.distance_miles} miles")
-```
-
-### Regulator Data Access
-
-```python
-from src.regulator.regulator_api import RegulatorAPI
-from datetime import datetime, timedelta
-
-# Initialize regulator API
-regulator_api = RegulatorAPI(database_connection=db)
-
-# Query prescriptions
-prescriptions = regulator_api.get_all_prescriptions(
-    status="active",
-    start_date=datetime.now() - timedelta(days=30),
-    end_date=datetime.now(),
-    limit=100,
-    offset=0
-)
-
-# Get statistics
-stats = regulator_api.get_statistics(
-    start_date=datetime.now() - timedelta(days=30),
-    end_date=datetime.now()
-)
-
-# Audit log access
-regulator_api.audit_log_access(
-    regulator_id="regulator-001",
-    action="query",
-    resource_type="prescription",
-    resource_id="all",
-    metadata={"filters": {"status": "active"}}
-)
-```
-
-## Dependencies
+### Dependencies
 
 ```
 # Core dependencies
-python >= 3.8
-fhir.resources >= 6.0.0
-hl7apy >= 1.3.4
-geopy >= 2.3.0
-requests >= 2.28.0
+requests>=2.31.0
+python-dateutil>=2.8.2
 
-# Optional dependencies
-sqlalchemy >= 1.4.0  # For database integration
-redis >= 4.0.0       # For caching
+# Analytics and ML
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+joblib>=1.3.0
+
+# Data visualization (optional)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+
+# Healthcare standards
+fhir.resources>=7.0.0
+hl7apy>=1.3.4
 ```
 
-## Testing
+---
 
-```bash
-# Run all tests
-pytest tests/
+## Integration with TypeScript Microservices
 
-# Run specific test module
-pytest tests/test_eprescribing.py
+This Python library is designed to be used alongside the TypeScript-based HealthFlow EPX microservices:
 
-# Run with coverage
-pytest --cov=src tests/
+```typescript
+// Call Python library from Node.js
+import { spawn } from 'child_process';
+
+const python = spawn('python3', [
+  'submit_prescription.py',
+  '--prescription-id', 'RX-2025-ABC123'
+]);
 ```
 
-## Documentation
+Or via REST API wrapper:
 
-Detailed documentation for each module is available in the `docs/` directory:
+```python
+# Flask/FastAPI wrapper for Python library
+from fastapi import FastAPI
+from src.gateway.prescription_submission_api import PrescriptionSubmissionGateway
 
-- [Prescribing Module Documentation](docs/prescribing.md)
-- [Dispensing Module Documentation](docs/dispensing.md)
-- [Regulator Module Documentation](docs/regulator.md)
-- [Integration Standards](docs/integrations.md)
-- [API Reference](docs/api_reference.md)
+app = FastAPI()
 
-## Contributing
+@app.post("/api/prescriptions/submit")
+async def submit_prescription(prescription: dict):
+    gateway = PrescriptionSubmissionGateway(db)
+    return gateway.submit_prescription(prescription)
+```
 
-This is an internal HealthFlow project. For contributions:
-
-1. Create a feature branch from `main`
-2. Implement changes with appropriate tests
-3. Ensure all tests pass
-4. Submit a pull request for review
-
-## Security
-
-This library handles sensitive healthcare information. Security considerations:
-
-- All data transmission must use TLS 1.2 or higher
-- PHI (Protected Health Information) must be encrypted at rest
-- Access must be logged for audit trails
-- Follow HIPAA compliance guidelines
-- Implement proper authentication and authorization
+---
 
 ## License
 
-Copyright © 2025 HealthFlow. All rights reserved.
+Proprietary - HealthFlow Egypt
+
+---
+
+## Version
+
+**v2.0.0** - Egyptian EPX Edition
+
+### Changelog
+
+- ✅ Egyptian healthcare identifiers (National ID, EMS, EDA)
+- ✅ Prescription format: RX-YYYY-XXXXXX
+- ✅ 27 Egyptian governorates support
+- ✅ Egyptian controlled substance schedules
+- ✅ Arabic language support for all models
+- ✅ Prescription submission gateway
+- ✅ Pharmacy retrieval APIs
+- ✅ Dispensing APIs
+- ✅ Regulator central database with analytics
+- ✅ ML-powered analytics engine
+- ✅ Comprehensive reporting services
+
+---
 
 ## Contact
 
 For questions or support, contact the HealthFlow development team.
-
-## Related Repositories
-
-- [healthflow-regulator-dashboard](https://github.com/HealthFlowEgy/healthflow-regulator-dashboard) - Regulator portal UI
-- [ai-prescription-validation-system](https://github.com/HealthFlowEgy/ai-prescription-validation-system) - AI-powered prescription validation
-- [healthflow-digital-prescription-portals](https://github.com/HealthFlowEgy/healthflow-digital-prescription-portals) - Digital prescription portals for doctors and pharmacies
