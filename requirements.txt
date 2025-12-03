@@ -1,44 +1,34 @@
 # Core dependencies for HealthFlow Information Exchange
 
+# HTTP client for API integrations
+requests>=2.31.0
+
+# Date and time utilities
+python-dateutil>=2.8.2
+
+# FastAPI and server
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+python-multipart>=0.0.6
+
+# Database
+sqlalchemy>=2.0.25
+psycopg2-binary>=2.9.9
+alembic>=1.13.1
+
+# Redis (optional - for caching)
+redis>=5.0.1
+
 # FHIR R4 support
-fhir.resources>=6.0.0
+fhir.resources>=7.0.0
 
 # HL7 v2.x support
 hl7apy>=1.3.4
 
 # Geographic calculations for pharmacy routing
 geopy>=2.3.0
-
-# HTTP client for API integrations
-requests>=2.28.0
-
-# Data validation
-pydantic>=1.10.0
-
-# Date and time utilities
-python-dateutil>=2.8.2
-
-# XML processing (built-in, but explicitly noted)
-# xml.etree.ElementTree (standard library)
-
-# Logging (standard library)
-# logging (standard library)
-
-# Optional dependencies for database integration
-sqlalchemy>=1.4.0
-
-# Optional dependencies for caching
-redis>=4.0.0
-
-# Optional dependencies for testing
-pytest>=7.0.0
-pytest-cov>=4.0.0
-pytest-mock>=3.10.0
-
-# Optional dependencies for development
-black>=22.0.0
-flake8>=5.0.0
-mypy>=0.990
 
 # Analytics and ML dependencies
 numpy>=1.24.0
@@ -50,3 +40,24 @@ joblib>=1.3.0
 matplotlib>=3.7.0
 seaborn>=0.12.0
 plotly>=5.14.0
+
+# Testing
+pytest>=7.4.3
+pytest-cov>=4.1.0
+pytest-asyncio>=0.23.3
+pytest-mock>=3.12.0
+httpx>=0.26.0
+
+# Code quality and linting
+black>=23.12.1
+flake8>=7.0.0
+isort>=5.13.2
+mypy>=1.8.0
+
+# Security scanning
+bandit>=1.7.6
+safety>=3.0.1
+
+# Documentation
+mkdocs>=1.5.3
+mkdocs-material>=9.5.3
